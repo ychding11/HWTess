@@ -71,22 +71,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			{
                 SetWindowTextA(g_hWnd,"");
 			}
-			else if (wParam == VK_F2)
-			{
-                SetWindowTextA(g_hWnd,"");
-			}
-			else if (wParam == VK_F3)
-			{
-                SetWindowTextA(g_hWnd,"");
-			}
-			else if ( key == 'u' )
-			{
-                SetWindowTextA(g_hWnd,"");
-			}
-    		else if ( key == 'd' )
-    		{
-                SetWindowTextA(g_hWnd,"");
-    		}
     		else if ( key == 'q' )
     		{
     			PostQuitMessage( 0 );
@@ -95,6 +79,46 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			{
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
 			}
+
+            switch (key)
+            {
+                case 'w':
+                {
+                    bool wire = RenderOption::getRenderOption().wireframeOn;
+                    RenderOption::getRenderOption().wireframeOn = !wire;
+                    break;
+                }
+                case 's':
+                {
+                    bool diag = RenderOption::getRenderOption().diagModeOn;
+                    RenderOption::getRenderOption().diagModeOn = !diag;
+                    break;
+                }
+                case 't':
+                {
+                    int wire = RenderOption::getRenderOption().tessellateFactor;
+                    RenderOption::getRenderOption().tessellateFactor = wire >= 64 ? 1 : wire * 2 > 64 ? wire + 1 : wire * 2;
+                    break;
+                }
+                case 'h':
+                {
+                    unsigned int height = RenderOption::getRenderOption().heightMapOn;
+                    RenderOption::getRenderOption().heightMapOn = !height;
+                    break;
+                }
+                case 'd':
+                {
+                    DiagType type = RenderOption::getRenderOption().diagType;
+                    RenderOption::getRenderOption().diagType = DiagType((type + 1) % DiagType::eDiagNum);
+                    break;
+                }
+                case 'f':
+                {
+                    bool fixed = RenderOption::getRenderOption().fixedCamera;
+                    RenderOption::getRenderOption().fixedCamera = !fixed;
+                    break;
+                }
+            }
     		break;
         }
     	case WM_DESTROY:
