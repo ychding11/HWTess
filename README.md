@@ -6,8 +6,11 @@
 - No material, Lighting model involved.
 
 ## Design 
-- A flexible design
-  - It is easy to extend the capability of adding new features
+We need a flexible design which is easy to extend the capability of adding new features.
+It depends upon a clear abstraction of whole process. We may need an unified interface to 
+handle all kinds of mesh data so that coding on interface other than raw data. It is also 
+important to collect and dispatch user's input clearly. Features involve combination of 
+different shader objects. It plays an important role in architecture design.
   
 ### Mesh Data Management
 - Data source such quad, bezier patch is independent of APP logic.
