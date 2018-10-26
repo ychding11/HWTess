@@ -15,6 +15,12 @@
   - APP use this interface feed data into tessellation pipe.
   
 ### Shader Management
+It may apply different effects to different mesh. An effect must contains vertex shader, pixel shader.
+It may also contain geometry shader, hull shader and domain shader. 
+- class *Shader* serves the purpose of container of all kinds of shader instances in an effect file.
+- class *ShaderContainer* is something like container of all instanced effect files.
+- Shader objects are queried from those two container when rendering each frame.
+
 
 ### Render Option Management
 - class *RenderOption* is designed to handle render options specified by user.
