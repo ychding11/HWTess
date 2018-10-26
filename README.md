@@ -8,19 +8,29 @@
 ## Design 
 - A flexible design
   - It is easy to extend the capability of adding new features
-- Data is independent of APP logic.
+  
+### Mesh Data Management
+- Data source such quad, bezier patch is independent of APP logic.
   - All Data Sources provide an unified interface. 
   - APP use this interface feed data into tessellation pipe.
   
+### Shader Management
+
+### Render Option Management
+- class *RenderOption* is designed to handle render options specified by user.
+- It is implemented as a singleton pattern to ensure globally single instance. 
+  
 ## Control
-All user control is by keyboard.
+All user controls are done by key stroke.
 
 - ESC/q	: exit app.
-- w		: wireframe mode.
+- w		: wire-frame mode.
 - t     : increase tessellation factor.
 - h     : apply height map.
 - f     : fixed camera.
 - d     : switch between diag modes.
+
+
 
 ## Demo 
 Waiting for Update...
