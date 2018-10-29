@@ -17,6 +17,8 @@ different shader objects. It plays an important role in architecture design.
   - All Data Sources provide an unified interface. 
   - APP use this interface feed data into tessellation pipe.
   
+  ![Class]()
+  
 ### Shader Management
 It may apply different effects to different mesh. An effect must contains vertex shader, pixel shader.
 It may also contain geometry shader, hull shader and domain shader. Different effects may have different
@@ -26,6 +28,8 @@ constant buffers which need to update in each frame.
 - class *ShaderContainer* is something like container of all instanced effect files.
 - Shader objects are queried from those two container when rendering each frame.
 - Constant buffer Update
+  - All effects share the same constant buffer structure.
+  - It simplify the design.
 
 
 ### Render Option Management
