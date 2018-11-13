@@ -12,8 +12,10 @@ IDXGISwapChain*				pSwapChain = nullptr;
 ID3D11RenderTargetView*		pRenderTargetView = nullptr;
 
 
-int width  = (LONG)::GetSystemMetrics(SM_CXSCREEN);
-int height = (LONG)::GetSystemMetrics(SM_CYSCREEN);
+//int width  = (LONG)::GetSystemMetrics(SM_CXSCREEN);
+//int height = (LONG)::GetSystemMetrics(SM_CYSCREEN);
+int width = (LONG)1280;
+int height = (LONG)720;
 
 
 #ifdef SAFE_RELEASE
@@ -133,7 +135,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 }
 
 #define CLASS_NAME  L"TutorialWindowClass"
-#define WINDOW_NAME L"D3D11 HW Tess"
+#define WINDOW_NAME L"D3D11 HW Tessellation"
 
 HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 {
@@ -278,7 +280,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     WIN_CALL_CHECK(InitWindow(hInstance, nCmdShow));
     D3D11_CALL_CHECK(InitializeD3D11(g_hWnd));
 
-    // app handle add here
+    // Add supported shader files.
     ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseQuad_new.hlsl");
     ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseBezierSurface.hlsl");
     ShaderContainer::getShaderContainer().Init(pd3dDevice);
