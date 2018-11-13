@@ -53,7 +53,9 @@ All user controls are done by key stroke.
 
 
 ## Demo 
-Waiting for Update...
+Waiting for Update...    
+
+![demo screenshot](./demo/demo.png)
 
 ## References
 -  [Tessellation in D3D11@GDC](https://www.gdcvault.com/play/1012740/Direct3D-11-In-Depth-Tutorial)
