@@ -17,7 +17,7 @@ different shader objects. It plays an important role in architecture design.
   - All Data Sources provide an unified interface. 
   - APP use this interface feed data into tessellation pipe.
   
-  ![Class]()
+  ![Class Diagram]()
   
 ### Shader Management
 It may apply different effects to different mesh. An effect must contains vertex shader, pixel shader.
@@ -31,14 +31,55 @@ constant buffers which need to update in each frame.
   - All effects share the same constant buffer structure.
   - It simplify the design.
 
+```
+struct FrameParam
+{
+    DirectX::XMFLOAT4X4  cbWorld;
+    DirectX::XMFLOAT4X4  cbViewProjection;
+    DirectX::XMFLOAT3    cbCameraPosWorld;
+    float cbTessellationFactor;
+    int   cbWireframeOn;
+    int   cbHeightMapOn;
+    int   cbDiagType;
+    float cbTexelCellU;
+    float cbTexelCellV;
+    float cbWorldCell;
+};
+
+```
 
 ### Render Option Management
-Render option provides an way for user to instruct rendering process. Some may involve 
+Render option provides a way for user to instruct rendering process. Some options may involve 
 render state change in GPU. Some may only affect code flow in CPU. I don't tell one from 
 another at first stage. All GPU involved options will be updated as part of constant buffer.
 
 - class *RenderOption* is designed to handle render options specified by user.
 - It is implemented as a singleton pattern to ensure globally single instance. 
+
+```
+struct RenderOption
+{
+    bool wireframeOn;
+    bool diagModeOn;
+    bool fixedCamera;
+    int  heightMapOn;
+    int  tessellateFactor;
+    DiagType diagType;
+    DirectX::XMMATRIX  world;
+
+    RenderOption::RenderOption()
+        : wireframeOn(false)
+        , diagModeOn(false)
+        , fixedCamera(false)
+        , heightMapOn(1)
+        , tessellateFactor(10)
+        , diagType(eDiagNormal)
+    { }
+
+    static RenderOption& getRenderOption();
+};
+
+```
   
 ## Control
 All user controls are done by key stroke.
