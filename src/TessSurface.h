@@ -59,6 +59,10 @@ struct RenderOption
 
 };
 
+// Manage D3D11 resources of Tessellation surface
+// Manage geometry data of Tessellation surface
+// Geometry data : Tessellation Surface == 1 : 1
+// Provide abstract interface for rendering
 class TessSurface
 {
 public:
@@ -69,6 +73,7 @@ public:
     };
 
 protected:
+
     IDataSource*  mMeshData;
 
     ID3D11Buffer*             mpcbFrameParam = nullptr;
@@ -119,11 +124,6 @@ public:
     virtual ~TessSurface()
     { }
 
-    virtual void SetupMeshData(IDataSource *data)
-    {
-        assert(data);
-        mMeshData = data;
-    }
 
     virtual void Initialize(ID3D11Device*  d3dDevice )
     {
@@ -140,24 +140,26 @@ protected:
 
 };
 
-class TessSurfaceManager
-{
-public:
-    static TessSurface& getTessSurface(std::string name = "");
-};
-
 class TessQuad : public TessSurface
 {
 public:
     TessQuad(IDataSource *data );
-    void Render(ID3D11DeviceContext* pd3dImmediateContext) override;
+
+    virtual void Render(ID3D11DeviceContext* pd3dImmediateContext) override;
 };
 
 class TessBezier : public TessSurface
 {
 public:
     TessBezier (IDataSource *data );
-    void Render(ID3D11DeviceContext* pd3dImmediateContext) override;
+
+    virtual void Render(ID3D11DeviceContext* pd3dImmediateContext) override;
+};
+
+class TessSurfaceManager
+{
+public:
+    static TessSurface& getTessSurface(std::string name = "");
 };
 
 #endif  
