@@ -272,6 +272,12 @@ HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	p
     TessSurfaceManager::getTessSurface().Render(pImmediateContext);
 
 	pSwapChain->Present( 0, 0 );
+
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
 	return S_OK;
 }
 

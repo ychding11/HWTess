@@ -3,8 +3,6 @@
 *.ilk
 *.VC.db
 *.ppm
-log.txt
-*.txt
 .vs
 ipch
 Debug
