@@ -51,7 +51,7 @@ struct RenderOption
         , diagModeOn(false)
         , fixedCamera(false)
         , heightMapOn(1)
-        , tessellateFactor(10)
+        , tessellateFactor(20)
         , diagType(eDiagNormal)
     { }
 

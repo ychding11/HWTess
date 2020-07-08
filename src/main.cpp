@@ -281,8 +281,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     D3D11_CALL_CHECK(InitializeD3D11(g_hWnd));
 
     // Add supported shader files.
-    ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseQuad_new.hlsl");
-    ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseBezierSurface.hlsl");
+    ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseQuad_new.hlsl");
+    ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseBezierSurface.hlsl");
     ShaderContainer::getShaderContainer().Init(pd3dDevice);
     TessSurfaceManager::getTessSurface().Initialize(pd3dDevice);;
 
