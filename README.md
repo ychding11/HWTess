@@ -1,21 +1,21 @@
 ## Overview
-- It is used to demo D3D11 HW Tessellation.
-  - What is HW Tessellation ?
-  - How to Control HW Tessellation by API and Shader ?
-- It is to explore new algorithms taking advantage of HW Tessellation.
-- No material, Lighting model involved.
+- It is to demo D3D11 HW Tessellation, including.
+  - What does HW Tessellation do ?
+  - How to program HW Tessellation by API and Shader ?
+  - Explore new graphics algorithms based on HW Tessellation.
+- Material & Lighting is not the topic.
 
 ## Design 
-We need a flexible design which is easy to extend the capability of adding new features.
-It depends upon a clear abstraction of whole process. We may need an unified interface to 
-handle all kinds of mesh data so that coding on interface other than raw data. It is also 
-important to collect and dispatch user's input clearly. Features involve combination of 
-different shader objects. It plays an important role in architecture design.
+It requires a flexible design, easy to extend the capability. It depends upon a deep understanding of rendering. 
+- a unified interface to handle all kinds of mesh data
+- coding on interface other than raw data. 
+- collect and dispatch user's input efficiently.
+- combination of different shader. 
   
 ### Mesh Data Management
-- Data source such quad, bezier patch is independent of APP logic.
-  - All Data Sources provide an unified interface. 
-  - APP use this interface feed data into tessellation pipe.
+- Data source, such as quad and bezier patch, is independent of application logic.
+  - Data Sources should adhere a unified interface. 
+  - Application codes based on this interface and feeds data into pipe.
   
   ![Class Diagram]()
   

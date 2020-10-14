@@ -75,7 +75,7 @@ struct HS_OUTPUT
     float3 vPosition           : BEZIERPOS;
 };
 
-// This constant hull shader is executed once per patch. 
+// This patch constant function is executed once per patch to compute patch-constant data 
 // In this sample, we set the tessellation factor
 // via SV_TessFactor and SV_InsideTessFactor for each patch.  In a more complex scene,
 // you might calculate a variable tessellation factor based on the camera's distance.

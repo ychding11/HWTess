@@ -29,7 +29,8 @@ TessSurface& TessSurfaceManager::getTessSurface(std::string name )
 {
     static TessSurface* surfaceQuad   = new TessQuad(&quad);
     static TessSurface* surfaceBezier = new TessBezier(&teapot);
-    return *surfaceQuad ;
+    //return *surfaceQuad ;
+    return *surfaceBezier;
 
 }
 
@@ -133,7 +134,7 @@ HRESULT TessSurface::CreateD3D11GraphicsObjects(ID3D11Device*  pd3dDevice)
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
     D3D11_CALL_CHECK(pd3dDevice->CreateSamplerState(&sampDesc, &mpSamplerLinear));
-    D3D11_CALL_CHECK(CreateWICTextureFromFile(pd3dDevice, L"heightmap.png",0, &mpHeightMapSRV));
+    D3D11_CALL_CHECK(CreateWICTextureFromFile(pd3dDevice, L"..\\heightmap.png",0, &mpHeightMapSRV));
     //D3D11_CALL_CHECK(DXUTCreateShaderResourceViewFromFile(pd3dDevice, L"heightmap.png", &mpHeightMapSRV));
 
     ////////////////////////////////////////////////////////////////////////
@@ -220,7 +221,7 @@ TessBezier::TessBezier(IDataSource *data)
 void TessBezier::Render(ID3D11DeviceContext* pd3dImmediateContext)
 {
     ShaderContainer& container = ShaderContainer::getShaderContainer();
-    Shader&  shdmgr = container[".\\shader\\TesseBezierSurface.hlsl"];
+    Shader&  shdmgr = container["..\\shader\\TesseBezierSurface.hlsl"];
 
     RenderOption & renderOption = RenderOption::getRenderOption();
     XMMATRIX world = renderOption.world;

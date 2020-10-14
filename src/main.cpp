@@ -5,6 +5,11 @@
 #include "IDataSource.h"
 #include "ShaderContainer.h"
 
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+
 HWND			            g_hWnd = NULL;
 ID3D11Device*				pd3dDevice = nullptr;
 ID3D11DeviceContext*		pImmediateContext = nullptr;
@@ -266,12 +271,18 @@ HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	p
     float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	pImmediateContext->OMSetRenderTargets( 1, &pRenderTargetView, NULL );
     pImmediateContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
-
     SetupViewport(0.f, 0.f, width, height);
+
 
     TessSurfaceManager::getTessSurface().Render(pImmediateContext);
 
+
 	pSwapChain->Present( 0, 0 );
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
 	return S_OK;
 }
 
@@ -280,11 +291,49 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     WIN_CALL_CHECK(InitWindow(hInstance, nCmdShow));
     D3D11_CALL_CHECK(InitializeD3D11(g_hWnd));
 
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	io.KeyMap[ImGuiKey_Tab] = VK_TAB;
+	io.KeyMap[ImGuiKey_LeftArrow] = VK_LEFT;
+	io.KeyMap[ImGuiKey_RightArrow] = VK_RIGHT;
+	io.KeyMap[ImGuiKey_UpArrow] = VK_UP;
+	io.KeyMap[ImGuiKey_DownArrow] = VK_DOWN;
+	io.KeyMap[ImGuiKey_PageUp] = VK_PRIOR;
+	io.KeyMap[ImGuiKey_PageDown] = VK_NEXT;
+	io.KeyMap[ImGuiKey_Home] = VK_HOME;
+	io.KeyMap[ImGuiKey_End] = VK_END;
+	io.KeyMap[ImGuiKey_Delete] = VK_DELETE;
+	io.KeyMap[ImGuiKey_Backspace] = VK_BACK;
+	io.KeyMap[ImGuiKey_Enter] = VK_RETURN;
+	io.KeyMap[ImGuiKey_Escape] = VK_ESCAPE;
+	io.KeyMap[ImGuiKey_A] = 'A';
+	io.KeyMap[ImGuiKey_C] = 'C';
+	io.KeyMap[ImGuiKey_V] = 'V';
+	io.KeyMap[ImGuiKey_X] = 'X';
+	io.KeyMap[ImGuiKey_Y] = 'Y';
+	io.KeyMap[ImGuiKey_Z] = 'Z';
+
+	io.ImeWindowHandle = g_hWnd;
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplWin32_Init(g_hWnd);
+	ImGui_ImplDX11_Init(pd3dDevice, pImmediateContext);
+
+
     // Add supported shader files.
-    ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseQuad_new.hlsl");
-    ShaderContainer::getShaderContainer().addShader(".\\shader\\TesseBezierSurface.hlsl");
+    ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseQuad_new.hlsl");
+    ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseBezierSurface.hlsl");
     ShaderContainer::getShaderContainer().Init(pd3dDevice);
     TessSurfaceManager::getTessSurface().Initialize(pd3dDevice);;
+
 
 	MSG msg = { 0 };
 	while( WM_QUIT != msg.message )
@@ -302,6 +351,10 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     
     ShaderContainer::getShaderContainer().Destory();
     TessSurfaceManager::getTessSurface().DestroyD3D11Objects();
+
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 
     SAFE_RELEASE(pRenderTargetView );
     SAFE_RELEASE(pSwapChain );
