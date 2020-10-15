@@ -55,7 +55,7 @@ struct RenderOption
         , diagType(eDiagNormal)
     { }
 
-    static RenderOption& getRenderOption();
+    static RenderOption& RenderOptions();
 
 };
 

@@ -114,15 +114,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			{
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
 			}
-            switch (key)
-            {
-                case 'h':
-                {
-                    unsigned int height = RenderOption::getRenderOption().heightMapOn;
-                    RenderOption::getRenderOption().heightMapOn = !height;
-                    break;
-                }
-            }
     		break;
         }
     	case WM_PAINT:
@@ -271,68 +262,6 @@ void  SetupViewport(float topLeftX, float topLeftY, int width, int height)
     pImmediateContext->RSSetViewports(1, &vp);
 }
 
-static float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static void updateGUI(void)
-{
-ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.6f);
-ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 2.0f);
-
-ImGui::SetNextWindowPos(ImVec2(2.0f, 2.0f));
-ImGui::Begin("stats", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
-//ImGui::Text("fps: %8.2f  %8.2f", fps, (1.f / avg_t));
-//ImGui::Text("frame: %d", (frameState.accumID));
-//ImGui::Text("time: %lf", elapsed);
-ImGui::End();
-
-ImGui::SetNextWindowPos(ImVec2(2.0f, 70.0f));
-ImGui::Begin("#controls", 0, 0);
-if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen))
-{
-    if (ImGui::ColorEdit3("background color", gClearColor)) { }
-    if (ImGui::Checkbox("wireframe", &RenderOption::getRenderOption().wireframeOn)) {}
-    ImGui::SameLine();
-    if (ImGui::Checkbox("diagmode", &RenderOption::getRenderOption().diagModeOn)) {}
-    ImGui::SameLine();
-    if (ImGui::Checkbox("heightmap", (bool*)&RenderOption::getRenderOption().heightMapOn)) {}
-    ImGui::Separator();
-    if (ImGui::Checkbox("fix camera", &RenderOption::getRenderOption().fixedCamera)) { }
-    if (ImGui::SliderInt("diag mode", (int*)(&RenderOption::getRenderOption().diagType), 0, 0)) { }
-    ImGui::Separator();
-    if (ImGui::SliderInt("tesselllate factor", &RenderOption::getRenderOption().tessellateFactor, 1, 64)) { }
-    ImGui::Separator();
-}
-ImGui::End();
-
-ImGui::PopStyleVar(3);
-}
-HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	pRenderTargetView )
-{
-	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, NULL );
-    pImmediateContext->ClearRenderTargetView(pRenderTargetView, gClearColor);
-    SetupViewport(0.f, 0.f, width, height);
-
-    //< ImGUI  new frame 
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame(); //< begin current frame
-
-
-    TessSurfaceManager::getTessSurface().Render(pImmediateContext);
-    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
-
-    updateGUI();
-    ImGui::Render(); //< end current frame
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-	pSwapChain->Present( 0, 0 );
-	return S_OK;
-}
-
 //< it depends on global variable, no parameter is needed.
 static void initImGUI(void)
 {
@@ -375,6 +304,66 @@ static void shutdownImGUI(void)
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+static float gClearColor[4] = { 0.4f, 0.3f, 0.3f, 1.0f };
+static void updateGUI(void)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.6f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 2.0f);
+
+    ImGui::SetNextWindowPos(ImVec2(2.0f, 2.0f));
+    ImGui::Begin("stats", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
+    ImGui::Text(" %.3f ms (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate); 
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(2.0f, 70.0f));
+    ImGui::Begin("Settings", 0, 0);
+    if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::ColorEdit3("background color", gClearColor)) { }
+        if (ImGui::Checkbox("wireframe", &RenderOption::RenderOptions().wireframeOn)) {}
+        ImGui::SameLine();
+        if (ImGui::Checkbox("diagmode", &RenderOption::RenderOptions().diagModeOn)) {}
+        ImGui::SameLine();
+        if (ImGui::Checkbox("heightmap", (bool*)&RenderOption::RenderOptions().heightMapOn)) {}
+        ImGui::Separator();
+        if (ImGui::Checkbox("fix camera", &RenderOption::RenderOptions().fixedCamera)) { }
+        if (ImGui::SliderInt("diag mode", (int*)(&RenderOption::RenderOptions().diagType), 0, 0)) { }
+        ImGui::Separator();
+        if (ImGui::SliderInt("tesselllate factor", &RenderOption::RenderOptions().tessellateFactor, 1, 64)) { }
+        ImGui::Separator();
+    }
+    ImGui::End();
+
+    ImGui::PopStyleVar(3);
+}
+HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	pRenderTargetView )
+{
+	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, NULL );
+    pImmediateContext->ClearRenderTargetView(pRenderTargetView, gClearColor);
+    SetupViewport(0.f, 0.f, width, height);
+
+    //< ImGUI  new frame 
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame(); //< begin current frame
+
+
+    TessSurfaceManager::getTessSurface().Render(pImmediateContext);
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
+
+    updateGUI();
+    ImGui::Render(); //< end current frame
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	pSwapChain->Present( 0, 0 );
+	return S_OK;
 }
 
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
