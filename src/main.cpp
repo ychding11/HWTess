@@ -330,7 +330,7 @@ static void updateGUI(void)
         if (ImGui::Checkbox("heightmap", (bool*)&RenderOption::RenderOptions().heightMapOn)) {}
         ImGui::Separator();
         if (ImGui::Checkbox("fix camera", &RenderOption::RenderOptions().fixedCamera)) { }
-        if (ImGui::SliderInt("diag mode", (int*)(&RenderOption::RenderOptions().diagType), 0, 0)) { }
+        if (ImGui::SliderInt("diag mode", (int*)(&RenderOption::RenderOptions().diagType), 0, 3)) { }
         ImGui::Separator();
         if (ImGui::SliderInt("tesselllate factor", &RenderOption::RenderOptions().tessellateFactor, 1, 64)) { }
         ImGui::Separator();

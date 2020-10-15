@@ -15,17 +15,20 @@
 Texture2D txSkin       : register(t0);
 SamplerState samLinear : register(s0);
 
+#include "../src/CommonType.h"
 //--------------------------------------------------------------------------------------
 // Constant Buffers
 //--------------------------------------------------------------------------------------
+#if 0
 cbuffer cbPerFrame : register( b0 )
 {
-    column_major matrix g_mWorld; // column_major is default.
+    matrix g_mWorld; // column_major is default.
     matrix g_mViewProjection;
     float3 g_vCameraPosWorld;
     float  g_fTessellationFactor;
     bool   cbWireframeOn;
 };
+#endif
 
 cbuffer cbMaterial : register(b1)
 {
@@ -57,7 +60,7 @@ struct VS_CONTROL_POINT_OUTPUT
 VS_CONTROL_POINT_OUTPUT VSMain( VS_CONTROL_POINT_INPUT Input )
 {
     VS_CONTROL_POINT_OUTPUT Output;
-    Output.vPosition = mul(float4(Input.vPosition,1.0), g_mWorld).xyz;
+    Output.vPosition = mul(float4(Input.vPosition,1.0), cbWorld).xyz;
     return Output;
 }
 
@@ -85,7 +88,7 @@ HS_CONSTANT_DATA_OUTPUT BezierConstantHS( InputPatch<VS_CONTROL_POINT_OUTPUT, IN
 {    
     HS_CONSTANT_DATA_OUTPUT Output;
 
-    float TessAmount = g_fTessellationFactor;
+    float TessAmount = cbTessellationFactor;
     Output.Edges[0] = Output.Edges[1] = Output.Edges[2] = Output.Edges[3] = TessAmount;
     Output.Inside[0] = Output.Inside[1] = TessAmount / 2.f;
     return Output;
@@ -200,7 +203,7 @@ DS_OUTPUT DSMain( HS_CONSTANT_DATA_OUTPUT input,
     Output.vWorldPos = WorldPos;
     Output.vNormal   = Norm;
     Output.vtex = UV;
-    Output.vPosition = mul( float4(WorldPos, 1.0), g_mViewProjection );
+    Output.vPosition = mul(float4(WorldPos, 1.0), cbViewProjection);
 
     return Output;    
 }
@@ -217,7 +220,14 @@ float4 PSMain( DS_OUTPUT Input ) : SV_TARGET
 //--------------------------------------------------------------------------------------
 // Solid color shading pixel shader (used for wireframe overlay)
 //--------------------------------------------------------------------------------------
-float4 DiagPSMain( DS_OUTPUT Input ) : SV_TARGET
+float4 DiagPSMain( DS_OUTPUT input ) : SV_TARGET
 {
-        return float4( 0.3, 0.4, 0.4, 1.0 );
+    float4 color = float4(0.2f,0.2f,0.2f,1.f);
+    if (cbDiagType == eDiagNormal)
+        color = float4(input.vNormal, 1.0f);
+    else if (cbDiagType == eDiagPosition)
+        color = input.vPosition;
+    else;
+
+    return color;
 }

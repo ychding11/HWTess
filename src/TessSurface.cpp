@@ -4,6 +4,7 @@
 #include "IDataSource.h"
 #include "WICTextureLoader.h"
 
+using namespace DirectX;
 
 #define D3D11_CALL_CHECK(x)                           \
 do{                                                   \
@@ -31,12 +32,11 @@ TessSurface& TessSurfaceManager::getTessSurface(std::string name )
     static TessSurface* surfaceBezier = new TessBezier(&teapot);
     //return *surfaceQuad ;
     return *surfaceBezier;
-
 }
 
 void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
 {
-    const RenderOption & renderOption = RenderOption::RenderOptions();
+    const RenderOption &renderOption = RenderOption::RenderOptions();
 
     XMVECTOR eyePos = { 0.0f,  1.f, -1.0f };
     XMVECTOR atPos  = { 0.0f, 0.0f, 0.0f };
@@ -54,7 +54,6 @@ void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
     XMMATRIX mProj = DirectX::XMMatrixPerspectiveFovLH(XM_PI / 2.f, 1.f, 0.1f, 600.0f);
     XMMATRIX mViewProjection = mView * mProj;
 
-
     D3D11_MAPPED_SUBRESOURCE MappedResource;
     pd3dImmediateContext->Map(mpcbFrameParam, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
     FrameParam* pData = reinterpret_cast<FrameParam*>(MappedResource.pData);
@@ -70,7 +69,6 @@ void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
     pData->cbTexelCellV = 0.002f;
     pData->cbWorldCell = 0.002f;
     pd3dImmediateContext->Unmap(mpcbFrameParam, 0);
-
 }
 
 HRESULT TessSurface::CreateD3D11GraphicsObjects(ID3D11Device*  pd3dDevice)
