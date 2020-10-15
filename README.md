@@ -49,12 +49,10 @@ struct FrameParam
 ```
 
 ### Render Option Management
-Render option provides a way for user to instruct rendering process. Some options may involve 
-render state change in GPU. Some may only affect code flow in CPU. I don't tell one from 
-another at first stage. All GPU involved options will be updated as part of constant buffer.
+Render option is a way to control rendering. Some may requires render state changes in GPU while some in CPU. I don't tell one from another.
 
-- class *RenderOption* is designed to handle render options specified by user.
-- It is implemented as a singleton pattern to ensure globally single instance. 
+- class *RenderOption* is to handle render options. 
+- It applies singleton pattern to ensure globally single instance. 
 
 ```
 struct RenderOption
@@ -80,18 +78,12 @@ struct RenderOption
 };
 
 ```
-  
+## Features
+
+
 ## Control
-All user controls are done by key stroke.
 
 - ESC/q	: exit app.
-- w		: wire-frame mode.
-- t     : increase tessellation factor.
-- h     : apply height map.
-- f     : fixed camera.
-- d     : switch between diag modes.
-
-
 
 ## Demo 
 Waiting for Update...    

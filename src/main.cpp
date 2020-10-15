@@ -61,18 +61,46 @@ do{                                                   \
 
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
+    ImGuiIO& io = ImGui::GetIO();
 	switch( message )
 	{
-    	case WM_PAINT:
-        {
-	        PAINTSTRUCT ps;
-	        HDC hdc;
-    		hdc = BeginPaint( hWnd, &ps );
-    		EndPaint( hWnd, &ps );
-    		break;
-        }
+        case WM_LBUTTONDOWN:
+            io.MouseDown[0] = true;
+            break;
+        case WM_LBUTTONUP:
+            io.MouseDown[0] = false;
+            break;
+        case WM_RBUTTONDOWN:
+            io.MouseDown[1] = true;
+            break;
+        case WM_RBUTTONUP:
+            io.MouseDown[1] = false;
+            break;
+        case WM_MBUTTONDOWN:
+            io.MouseDown[2] = true;
+            break;
+        case WM_MBUTTONUP:
+            io.MouseDown[2] = false;
+            break;
+        case WM_MOUSEWHEEL:
+            io.MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f;
+            break;
+        case WM_MOUSEMOVE:
+            io.MousePos.x = (signed short)(lParam);
+            io.MousePos.y = (signed short)(lParam >> 16);
+            break;
+        case WM_KEYDOWN:
+            if (wParam < 256)
+                io.KeysDown[wParam] = 1;
+            break;
+        case WM_CHAR:
+            if (wParam > 0 && wParam < 0x10000)
+                io.AddInputCharacter(uint16_t(wParam));
+            break;
     	case WM_KEYUP:
         {
+            if (wParam < 256)
+                io.KeysDown[wParam] = 0;
             char key = tolower((int)wParam);
 			if (wParam == VK_F1)
 			{
@@ -86,46 +114,14 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			{
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
 			}
-
-            switch (key)
-            {
-                case 'w':
-                {
-                    bool wire = RenderOption::getRenderOption().wireframeOn;
-                    RenderOption::getRenderOption().wireframeOn = !wire;
-                    break;
-                }
-                case 's':
-                {
-                    bool diag = RenderOption::getRenderOption().diagModeOn;
-                    RenderOption::getRenderOption().diagModeOn = !diag;
-                    break;
-                }
-                case 't':
-                {
-                    int wire = RenderOption::getRenderOption().tessellateFactor;
-                    RenderOption::getRenderOption().tessellateFactor = wire >= 64 ? 1 : wire * 2 > 64 ? wire + 1 : wire * 2;
-                    break;
-                }
-                case 'h':
-                {
-                    unsigned int height = RenderOption::getRenderOption().heightMapOn;
-                    RenderOption::getRenderOption().heightMapOn = !height;
-                    break;
-                }
-                case 'd':
-                {
-                    DiagType type = RenderOption::getRenderOption().diagType;
-                    RenderOption::getRenderOption().diagType = DiagType((type + 1) % DiagType::eDiagNum);
-                    break;
-                }
-                case 'f':
-                {
-                    bool fixed = RenderOption::getRenderOption().fixedCamera;
-                    RenderOption::getRenderOption().fixedCamera = !fixed;
-                    break;
-                }
-            }
+    		break;
+        }
+    	case WM_PAINT:
+        {
+	        PAINTSTRUCT ps;
+	        HDC hdc;
+    		hdc = BeginPaint( hWnd, &ps );
+    		EndPaint( hWnd, &ps );
     		break;
         }
     	case WM_DESTROY:
@@ -165,7 +161,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
     }
 
 	RECT rc = { 0, 0, width, height };
-	AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
+	//AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 	g_hWnd = CreateWindow( CLASS_NAME, WINDOW_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL );
     if (g_hWnd == NULL)
     {
@@ -266,37 +262,13 @@ void  SetupViewport(float topLeftX, float topLeftY, int width, int height)
     pImmediateContext->RSSetViewports(1, &vp);
 }
 
-HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	pRenderTargetView )
+//< it depends on global variable, no parameter is needed.
+static void initImGUI(void)
 {
-    float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	pImmediateContext->OMSetRenderTargets( 1, &pRenderTargetView, NULL );
-    pImmediateContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
-    SetupViewport(0.f, 0.f, width, height);
-
-
-    TessSurfaceManager::getTessSurface().Render(pImmediateContext);
-
-
-	pSwapChain->Present( 0, 0 );
-    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
-    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
-	return S_OK;
-}
-
-int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
-{
-    WIN_CALL_CHECK(InitWindow(hInstance, nCmdShow));
-    D3D11_CALL_CHECK(InitializeD3D11(g_hWnd));
-
-	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
 
 	io.KeyMap[ImGuiKey_Tab] = VK_TAB;
 	io.KeyMap[ImGuiKey_LeftArrow] = VK_LEFT;
@@ -321,12 +293,92 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	io.ImeWindowHandle = g_hWnd;
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(pd3dDevice, pImmediateContext);
+}
+static void shutdownImGUI(void)
+{
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
 
+static float gClearColor[4] = { 0.4f, 0.3f, 0.3f, 1.0f };
+static void updateGUI(void)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.6f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 2.0f);
+
+    ImGui::SetNextWindowPos(ImVec2(2.0f, 2.0f));
+    ImGui::Begin("stats", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
+    ImGui::Text(" %.3f ms (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate); 
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(2.0f, 70.0f));
+    ImGui::Begin("Settings", 0, 0);
+    if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::ColorEdit3("background color", gClearColor)) { }
+        if (ImGui::Checkbox("wireframe", &RenderOption::RenderOptions().wireframeOn)) {}
+        ImGui::SameLine();
+        if (ImGui::Checkbox("diagmode", &RenderOption::RenderOptions().diagModeOn)) {}
+        ImGui::SameLine();
+        if (ImGui::Checkbox("heightmap", (bool*)&RenderOption::RenderOptions().heightMapOn)) {}
+        ImGui::Separator();
+        if (ImGui::Checkbox("fix camera", &RenderOption::RenderOptions().fixedCamera)) { }
+        if (ImGui::SliderInt("diag mode", (int*)(&RenderOption::RenderOptions().diagType), 0, 3)) { }
+        ImGui::Separator();
+        if (ImGui::SliderInt("tesselllate factor", &RenderOption::RenderOptions().tessellateFactor, 1, 64)) { }
+        ImGui::Separator();
+    }
+    ImGui::End();
+
+    ImGui::PopStyleVar(3);
+}
+HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	pRenderTargetView )
+{
+	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, NULL );
+    pImmediateContext->ClearRenderTargetView(pRenderTargetView, gClearColor);
+    SetupViewport(0.f, 0.f, width, height);
+
+    //< ImGUI  new frame 
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame(); //< begin current frame
+
+    TessSurfaceManager::getTessSurface().Render(pImmediateContext);
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
+
+    updateGUI();
+    ImGui::Render(); //< end current frame
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+
+	pSwapChain->Present( 0, 0 );
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
+	return S_OK;
+}
+
+int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
+{
+	ImGui::CreateContext();
+
+    WIN_CALL_CHECK(InitWindow(hInstance, nCmdShow));
+    D3D11_CALL_CHECK(InitializeD3D11(g_hWnd));
+
+    initImGUI();
 
     // Add supported shader files.
     ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseQuad_new.hlsl");
@@ -352,9 +404,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     ShaderContainer::getShaderContainer().Destory();
     TessSurfaceManager::getTessSurface().DestroyD3D11Objects();
 
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+    shutdownImGUI();
 
     SAFE_RELEASE(pRenderTargetView );
     SAFE_RELEASE(pSwapChain );

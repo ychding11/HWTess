@@ -6,14 +6,17 @@
 #include <DirectXMath.h>
 #include "IDataSource.h"
 #include "ShaderContainer.h"
+#include "CommonType.h"
 
 
-using namespace DirectX;
+//using namespace DirectX;
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = nullptr; } }
 #endif
 
+
+#if 0
 enum DiagType
 {
     eDiagNormal       = 0,
@@ -35,6 +38,7 @@ struct FrameParam
     float cbTexelCellV;
     float cbWorldCell;
 };
+#endif
 
 struct RenderOption
 {
@@ -55,7 +59,7 @@ struct RenderOption
         , diagType(eDiagNormal)
     { }
 
-    static RenderOption& getRenderOption();
+    static RenderOption& RenderOptions();
 
 };
 

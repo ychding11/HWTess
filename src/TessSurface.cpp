@@ -4,6 +4,7 @@
 #include "IDataSource.h"
 #include "WICTextureLoader.h"
 
+using namespace DirectX;
 
 #define D3D11_CALL_CHECK(x)                           \
 do{                                                   \
@@ -18,7 +19,7 @@ do{                                                   \
 
 
 static RenderOption renderOption;
-RenderOption& RenderOption::getRenderOption()
+RenderOption& RenderOption::RenderOptions()
 {
     return renderOption;
 }
@@ -31,12 +32,11 @@ TessSurface& TessSurfaceManager::getTessSurface(std::string name )
     static TessSurface* surfaceBezier = new TessBezier(&teapot);
     //return *surfaceQuad ;
     return *surfaceBezier;
-
 }
 
 void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
 {
-    const RenderOption & renderOption = RenderOption::getRenderOption();
+    const RenderOption &renderOption = RenderOption::RenderOptions();
 
     XMVECTOR eyePos = { 0.0f,  1.f, -1.0f };
     XMVECTOR atPos  = { 0.0f, 0.0f, 0.0f };
@@ -54,7 +54,6 @@ void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
     XMMATRIX mProj = DirectX::XMMatrixPerspectiveFovLH(XM_PI / 2.f, 1.f, 0.1f, 600.0f);
     XMMATRIX mViewProjection = mView * mProj;
 
-
     D3D11_MAPPED_SUBRESOURCE MappedResource;
     pd3dImmediateContext->Map(mpcbFrameParam, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
     FrameParam* pData = reinterpret_cast<FrameParam*>(MappedResource.pData);
@@ -70,7 +69,6 @@ void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
     pData->cbTexelCellV = 0.002f;
     pData->cbWorldCell = 0.002f;
     pd3dImmediateContext->Unmap(mpcbFrameParam, 0);
-
 }
 
 HRESULT TessSurface::CreateD3D11GraphicsObjects(ID3D11Device*  pd3dDevice)
@@ -157,7 +155,7 @@ void TessQuad::Render(ID3D11DeviceContext* pd3dImmediateContext)
     ShaderContainer& container = ShaderContainer::getShaderContainer();
     Shader&  shdmgr = container[".\\shader\\TesseQuad_new.hlsl"];
 
-    RenderOption & renderOption = RenderOption::getRenderOption();
+    RenderOption & renderOption = RenderOption::RenderOptions();
     renderOption.world = DirectX::XMMatrixIdentity();
 
     UINT Stride = sizeof(ControlPoint);
@@ -184,25 +182,25 @@ void TessQuad::Render(ID3D11DeviceContext* pd3dImmediateContext)
     pd3dImmediateContext->DSSetShaderResources(0, 1, &mpHeightMapSRV);
 
     // Diag mode
-    if (RenderOption::getRenderOption().diagModeOn)
+    if (RenderOption::RenderOptions().diagModeOn)
     {
         pd3dImmediateContext->RSSetState(mpRSSolid);
         pd3dImmediateContext->PSSetShader(shdmgr.getPixelShader("DiagPixelShader"), nullptr, 0);
         pd3dImmediateContext->DrawIndexed(mMeshData->IBufferElement(), 0, 0);
     }
-    else if (RenderOption::getRenderOption().wireframeOn)
+    else if (RenderOption::RenderOptions().wireframeOn)
     {
-        RenderOption::getRenderOption().wireframeOn = false;
+        RenderOption::RenderOptions().wireframeOn = false;
         UpdateCBParam(pd3dImmediateContext);
         pd3dImmediateContext->RSSetState(mpRSSolid);
         pd3dImmediateContext->PSSetShader(shdmgr.getPixelShader("PlainPixelShader"), nullptr, 0);
         pd3dImmediateContext->DrawIndexed(mMeshData->IBufferElement(), 0, 0);
 
-        RenderOption::getRenderOption().wireframeOn = true;
+        RenderOption::RenderOptions().wireframeOn = true;
         UpdateCBParam(pd3dImmediateContext);
         pd3dImmediateContext->RSSetState(mpRSWireframe);
         pd3dImmediateContext->DrawIndexed(mMeshData->IBufferElement(), 0, 0);
-        RenderOption::getRenderOption().wireframeOn = true;
+        RenderOption::RenderOptions().wireframeOn = true;
 
     }
     else
@@ -223,7 +221,7 @@ void TessBezier::Render(ID3D11DeviceContext* pd3dImmediateContext)
     ShaderContainer& container = ShaderContainer::getShaderContainer();
     Shader&  shdmgr = container["..\\shader\\TesseBezierSurface.hlsl"];
 
-    RenderOption & renderOption = RenderOption::getRenderOption();
+    RenderOption & renderOption = RenderOption::RenderOptions();
     XMMATRIX world = renderOption.world;
     world = XMMatrixScaling( 0.20f, 0.25f, 0.25f );
     world = XMMatrixMultiply( XMMatrixScaling( 0.18f, 0.25f, 0.25f ), XMMatrixRotationX( -.5f * 3.1415926f ));
