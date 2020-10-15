@@ -350,7 +350,6 @@ HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	p
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame(); //< begin current frame
 
-
     TessSurfaceManager::getTessSurface().Render(pImmediateContext);
     pImmediateContext->VSSetShader(nullptr, nullptr, 0);
     pImmediateContext->HSSetShader(nullptr, nullptr, 0);
@@ -362,7 +361,13 @@ HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	p
     ImGui::Render(); //< end current frame
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+
 	pSwapChain->Present( 0, 0 );
+    pImmediateContext->VSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->HSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->DSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->GSSetShader(nullptr, nullptr, 0);
+    pImmediateContext->PSSetShader(nullptr, nullptr, 0);
 	return S_OK;
 }
 
@@ -380,6 +385,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     ShaderContainer::getShaderContainer().addShader("..\\shader\\TesseBezierSurface.hlsl");
     ShaderContainer::getShaderContainer().Init(pd3dDevice);
     TessSurfaceManager::getTessSurface().Initialize(pd3dDevice);;
+
 
 	MSG msg = { 0 };
 	while( WM_QUIT != msg.message )
