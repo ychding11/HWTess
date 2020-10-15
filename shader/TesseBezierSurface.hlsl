@@ -211,10 +211,16 @@ DS_OUTPUT DSMain( HS_CONSTANT_DATA_OUTPUT input,
 //--------------------------------------------------------------------------------------
 // Solid color shading pixel shader (used for wireframe overlay)
 //--------------------------------------------------------------------------------------
-float4 PSMain( DS_OUTPUT Input ) : SV_TARGET
+float4 PSMain( DS_OUTPUT input ) : SV_TARGET
 {
-    //return float4( 0.f, 1.0f, 0.f, 1.0 );
-        return float4( 0.3, 0.4, 0.4, 1.0 );
+    float3 light = float3(0,10.f,0);
+    float3 p = input.vWorldPos;
+    float3 N = input.vNormal;
+    float3 V = cbCameraPosWorld - p;
+    float3 L = light - p;
+    float3 radiance = float3(1.f, 1.0f, 1.f) * dot(N,L);
+
+    return float4(radiance, 1.0 );
 }
 
 //--------------------------------------------------------------------------------------

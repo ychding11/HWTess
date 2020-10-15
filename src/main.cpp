@@ -362,7 +362,7 @@ HRESULT Render(ID3D11DeviceContext*	pImmediateContext, ID3D11RenderTargetView*	p
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 
-	pSwapChain->Present( 0, 0 );
+	pSwapChain->Present( 1, 0 );
     pImmediateContext->VSSetShader(nullptr, nullptr, 0);
     pImmediateContext->HSSetShader(nullptr, nullptr, 0);
     pImmediateContext->DSSetShader(nullptr, nullptr, 0);

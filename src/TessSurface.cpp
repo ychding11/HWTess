@@ -73,7 +73,6 @@ void TessSurface::UpdateCBParam(ID3D11DeviceContext* pd3dImmediateContext)
 
 HRESULT TessSurface::CreateD3D11GraphicsObjects(ID3D11Device*  pd3dDevice)
 {
-
     ////////////////////////////////////////////////////////////////////////
     /// Const Buffer
     ////////////////////////////////////////////////////////////////////////
@@ -261,12 +260,13 @@ void TessBezier::Render(ID3D11DeviceContext* pd3dImmediateContext)
     else if (renderOption.wireframeOn)
     {
         pd3dImmediateContext->RSSetState(mpRSWireframe);
+        pd3dImmediateContext->PSSetShader(shdmgr.getPixelShader("PlainPixelShader"), nullptr, 0);
         pd3dImmediateContext->DrawIndexed(mMeshData->IBufferElement(), 0, 0);
     }
     else
     {
-       // pd3dImmediateContext->RSSetState(mpRSSolid);
-        pd3dImmediateContext->RSSetState(mpRSWireframe);
+        pd3dImmediateContext->RSSetState(mpRSSolid);
+        //pd3dImmediateContext->RSSetState(mpRSWireframe);
         pd3dImmediateContext->PSSetShader(shdmgr.getPixelShader("PlainPixelShader"), nullptr, 0);
         pd3dImmediateContext->DrawIndexed(mMeshData->IBufferElement(), 0, 0);
     }
