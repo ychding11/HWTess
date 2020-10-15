@@ -20,33 +20,13 @@ It requires a flexible design, easy to extend the capability. It depends upon a 
   ![Class Diagram]()
   
 ### Shader Management
-It may apply different effects to different mesh. An effect must contains vertex shader, pixel shader.
-It may also contain geometry shader, hull shader and domain shader. Different effects may have different
-constant buffers which need to update in each frame.
+- It is free to map between effects and mesh.
+- An effect must contain vertex shader and pixel shader. It may have other shaders such as Hull Shader, Domain Shader.
+- Different effects share one common constant buffers which may be big in size. 
 
 - class *Shader* serves the purpose of container of all kinds of shader instances in an effect file.
 - class *ShaderContainer* is something like container of all instanced effect files.
 - Shader objects are queried from those two container when rendering each frame.
-- Constant buffer Update
-  - All effects share the same constant buffer structure.
-  - It simplify the design.
-
-```
-struct FrameParam
-{
-    DirectX::XMFLOAT4X4  cbWorld;
-    DirectX::XMFLOAT4X4  cbViewProjection;
-    DirectX::XMFLOAT3    cbCameraPosWorld;
-    float cbTessellationFactor;
-    int   cbWireframeOn;
-    int   cbHeightMapOn;
-    int   cbDiagType;
-    float cbTexelCellU;
-    float cbTexelCellV;
-    float cbWorldCell;
-};
-
-```
 
 ### Render Option Management
 Render option is a way to control rendering. Some may requires render state changes in GPU while some in CPU. I don't tell one from another.
@@ -79,16 +59,17 @@ struct RenderOption
 
 ```
 ## Features
-
+- an ImGUI based UI.
+- cmake build.
 
 ## Control
 
 - ESC/q	: exit app.
 
 ## Demo 
-Waiting for Update...    
 
-![demo screenshot](./demo/demo.png)
+Update...
+
 
 ## References
 -  [Tessellation in D3D11@GDC](https://www.gdcvault.com/play/1012740/Direct3D-11-In-Depth-Tutorial)
