@@ -1,7 +1,7 @@
 ## Overview
-- It is to demo D3D11 HW Tessellation, including.
+- It is to demo D3D11 HW Tessellation.
   - What does HW Tessellation do ?
-  - How to program HW Tessellation by API and Shader ?
+  - How to program HW Tessellation ?
   - Explore new graphics algorithms based on HW Tessellation.
 - Material & Lighting is not the topic.
 
